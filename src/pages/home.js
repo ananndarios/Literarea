@@ -204,15 +204,13 @@ function userProfile(actualUser) {
     <div class="exchange-books"> </div>
   </section>`
 
-  const username = `
-  ${firebase.firestore()
+  firebase.firestore()
     .collection('users')
     .doc(actualUser)
     .get()
     .then(function(doc) {
-      document.querySelector('.user-name')
-      .innerHTML = "Livros de:  " + doc.data().name
-    })}`
+      document.querySelector('.user-name').innerHTML = "Livros de:  " + doc.data().name;
+    })
 
 
   firebase.firestore()
@@ -221,84 +219,82 @@ function userProfile(actualUser) {
   .collection('iWant')
   .onSnapshot((querySnapshot) => {
     if (querySnapshot.size > 0) {
+      document.querySelector('.iwant-books').innerHTML = '';
       querySnapshot.forEach((doc) => {
-        const iWantTemplate = `
+        let iWantTemplate = `
+         <section class="book-card" data-id="">
+            <img src="${doc.data().photo}"/>
+            <article class="book-info">
+              <p class="book-title">${doc.data().title}</p>
+                <p class="book-title">${doc.data().author}</p>
+              <button type="button" class="message-btn search-btn register-link"
+                onclick=app.message()>Mensagem</button>
+            </article>
+          </section>
+          `
+          document.querySelector('.iwant-books').innerHTML += iWantTemplate;
+        })
+
+      } else {
+        document.querySelector('.iwant-books').innerHTML = `<p class="list-title empty-list"> Ainda não há livros na lista de desejados </p>`;
+      }
+    });
+
+
+  firebase.firestore()
+  .collection('users')
+  .doc(actualUser)
+  .collection('exchange')
+  .onSnapshot((querySnapshot) => {
+    if (querySnapshot.size > 0) {
+      document.querySelector('.exchange-books').innerHTML = '';
+      querySnapshot.forEach((doc) => {
+        let exchangeTemplate = `
         <section class="book-card" data-id="">
-           <img src="${doc.data().photo}"/>
-           <article class="book-info">
-             <p class="book-title">${doc.data().title}</p>
+            <img src="${doc.data().photo}"/>
+            <article class="book-info">
+              <p class="book-title">${doc.data().title}</p>
               <p class="book-title">${doc.data().author}</p>
-             <button type="button" class="message-btn search-btn register-link"
-               onclick=app.message()>Mensagem</button>
-           </article>
-         </section>
-        `
-        document.querySelector('.iwant-books').innerHTML = iWantTemplate;
-
-
-        firebase.firestore()
-        .collection('users')
-        .doc(actualUser)
-        .collection('exchange')
-        .onSnapshot((querySnapshot) => {
-          if (querySnapshot.size > 0) {
-            querySnapshot.forEach((doc) => {
-              const exchangeTemplate = `
-              <section class="book-card" data-id="">
-                 <img src="${doc.data().photo}"/>
-                 <article class="book-info">
-                   <p class="book-title">${doc.data().title}</p>
-                    <p class="book-title">${doc.data().author}</p>
-                   <button type="button" class="message-btn search-btn register-link"
-                     onclick=app.message()>Mensagem</button>
-                 </article>
-               </section>
-              `
-              document.querySelector('.exchange-books').innerHTML = exchangeTemplate;
-            })
-           } else {
-            document.querySelector('.exchange-books')
-            .innerHTML = `<p class="list-title empty-list"> 
-            Ainda não há livros na lista de disponíveis para troca </p>`;
-           }
-          })
-
-              firebase.firestore()
-              .collection('users')
-              .doc(actualUser)
-              .collection('donation')
-              .onSnapshot((querySnapshot) => {
-                if (querySnapshot.size > 0) {
-                  querySnapshot.forEach((doc) => {
-                    const donationTemplate = `
-                    <section class="book-card" data-id="">
-                       <img src="${doc.data().photo}"/>
-                       <article class="book-info">
-                         <p class="book-title">${doc.data().title}</p>
-                          <p class="book-title">${doc.data().author}</p>
-                         <button type="button" class="message-btn search-btn register-link"
-                           onclick=app.message()>Mensagem</button>
-                       </article>
-                     </section>
-                    `
-                    document.querySelector('.donation-books').innerHTML = donationTemplate;
+              <button type="button" class="message-btn search-btn register-link"
+                onclick=app.message()>Mensagem</button>
+            </article>
+          </section>
+        `;
+        document.querySelector('.exchange-books').innerHTML += exchangeTemplate;
       })
-     } else {
-      document.querySelector('.donation-books')
-      .innerHTML = `<p class="list-title empty-list"> Ainda não há livros na lista de doando </p>`
-     }
-    })
-   })
-  } else {
-    document.querySelector('.iwant-books')
-      .innerHTML = `<p class="list-title empty-list"> Ainda não há livros na lista de desejados </p>`;
-    document.querySelector('.donation-books')
-      .innerHTML = `<p class="list-title empty-list"> Ainda não há livros na lista de doando </p>`;
-    document.querySelector('.exchange-books')
-      .innerHTML = `<p class="list-title empty-list"> 
-       Ainda não há livros na lista de disponíveis para troca </p>`
-  }
- })
+    
+    } else {
+      document.querySelector('.exchange-books').innerHTML = `<p class="list-title empty-list"> 
+      Ainda não há livros na lista de disponíveis para troca </p>`;
+    }
+  });
+
+  firebase.firestore()
+  .collection('users')
+  .doc(actualUser)
+  .collection('donation')
+  .onSnapshot((querySnapshot) => {
+    if (querySnapshot.size > 0) {
+      document.querySelector('.donation-books').innerHTML =  '';
+      querySnapshot.forEach((doc) => {
+        let donationTemplate = `
+        <section class="book-card" data-id="">
+            <img src="${doc.data().photo}"/>
+            <article class="book-info">
+              <p class="book-title">${doc.data().title}</p>
+              <p class="book-title">${doc.data().author}</p>
+              <button type="button" class="message-btn search-btn register-link"
+                onclick=app.message()>Mensagem</button>
+            </article>
+          </section>
+        `;
+        document.querySelector('.donation-books').innerHTML += donationTemplate;
+      })
+      
+    } else {
+      document.querySelector('.donation-books').innerHTML = `<p class="list-title empty-list"> Ainda não há livros na lista de doando </p>`
+    }
+  });
 }
 
 function message() {
